@@ -2,7 +2,7 @@
 import numpy as np
 import pandas as pd
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import LabelEncoder, StandardScaler
+from sklearn.preprocessing import LabelEncoder, StandardScaler, OneHotEncoder
 from sklearn.impute import SimpleImputer
 from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
@@ -115,4 +115,4 @@ test_predictions_labels = label_encoder.inverse_transform(test_predictions)
 # Prepare the submission file
 submission = pd.DataFrame({"ID": test_ids, "Credit_Score": test_predictions_labels})
 submission.to_csv("submission_ANN.csv", index=False)
-print("Submission file 'submission_ANN.csv' created successfully!")
+print("Submission file 'submission_ANN.csv' created successfully!")     
