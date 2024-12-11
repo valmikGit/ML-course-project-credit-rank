@@ -7,7 +7,7 @@ from sklearn.impute import SimpleImputer
 from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
 from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Dense, Conv1D, Flatten, Dropout
+from tensorflow.keras.layers import Dense, Dropout
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.callbacks import EarlyStopping
 from sklearn.metrics import accuracy_score
@@ -82,21 +82,16 @@ X_test_preprocessed = preprocessor.transform(test_data)
 X_train_np = X_train_preprocessed.toarray()
 y_train_np = np.array(y_train)
 
-# Reshape data for CNN (adding a channel dimension for Conv1D)
-X_train_np = X_train_np.reshape(X_train_np.shape[0], X_train_np.shape[1], 1)
-X_test_np = X_test_preprocessed.toarray().reshape(X_test_preprocessed.shape[0], X_test_preprocessed.shape[1], 1)
-
 # Split training data into training and validation sets
 X_train_np, X_val_np, y_train_np, y_val_np = train_test_split(X_train_np, y_train_np, test_size=0.2, random_state=42, stratify=y_train_np)
 
-# Define the CNN model
+# Define the ANN model
 model = Sequential([
-    Conv1D(filters=64, kernel_size=3, activation="relu", input_shape=(X_train_np.shape[1], 1)),
+    Dense(128, activation="relu", input_shape=(X_train_np.shape[1],)),
     Dropout(0.3),
-    Conv1D(filters=32, kernel_size=3, activation="relu"),
+    Dense(64, activation="relu"),
     Dropout(0.3),
-    Flatten(),
-    Dense(128, activation="relu"),
+    Dense(32, activation="relu"),
     Dropout(0.3),
     Dense(3, activation="softmax")  # 3 classes for Credit_Score
 ])
@@ -114,10 +109,10 @@ val_accuracy = accuracy_score(y_val_np, val_predictions)
 print(f"Validation Accuracy: {val_accuracy}")
 
 # Make predictions on test data
-test_predictions = model.predict(X_test_np).argmax(axis=1)
+test_predictions = model.predict(X_test_preprocessed.toarray()).argmax(axis=1)
 test_predictions_labels = label_encoder.inverse_transform(test_predictions)
 
 # Prepare the submission file
 submission = pd.DataFrame({"ID": test_ids, "Credit_Score": test_predictions_labels})
-submission.to_csv("submission_CNN.csv", index=False)
-print("Submission file 'submission_CNN.csv' created successfully!")
+submission.to_csv("submission_ANN.csv", index=False)
+print("Submission file 'submission_ANN.csv' created successfully!")
